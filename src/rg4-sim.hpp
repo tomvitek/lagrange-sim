@@ -44,20 +44,28 @@ public:
     ) {
         Derived x = x0;
         this->writer.open();
+        writer.write(0, x);
 
-        std::cerr << "0%" << std::flush;
+        if (writeStatus)
+            std::cerr << "0%" << std::flush;
         const uint64_t iterationCount = (t_to - t_from) / t_step;
-        double nextSaveTime = 0;
+        const double saveTimeDelta = (t_to - t_from) / (saveCount - 1);
+        double nextSaveTime = saveTimeDelta;
         uint64_t iteration = 0;
 
         while (iteration < iterationCount) {
             double t = iteration * t_step;
+            
             x = this->step(t, t_step, x);
             iteration++;
             if (t > nextSaveTime) {
                 writer.write(t, x);
-                nextSaveTime += (t_to - t_from) / (saveCount - 1);
-                std::cerr << '\r' << iteration * 100 / iterationCount << "%" << std::flush;
+                nextSaveTime += saveTimeDelta;
+
+                if (this->writeStatus){
+                    
+                    std::cerr << "\r                 \r" << iteration * 1000 / iterationCount / 10.0 << "%" << std::flush;
+                }
             }
         }
 
@@ -77,6 +85,10 @@ public:
      * 
      */
     SolverFunc<Derived> func;
+    /**
+     * @brief Set this to false if you don't want to see simulation percentage in cerr.
+     */
+    bool writeStatus = true;
 protected:
     /**
      * @brief Performs one step of the simulation

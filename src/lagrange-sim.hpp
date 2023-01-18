@@ -3,6 +3,11 @@
 
 #include <eigen3/Eigen/Eigen>
 
+struct TestBody {
+    Eigen::Vector2d pos;
+    Eigen::Vector2d vel;
+};
+
 /**
  * @brief Simulation parameters
  * 
@@ -38,5 +43,7 @@ struct SimParams {
 Eigen::ArrayXXd lagrangeFunc(double t, const Eigen::Ref<Eigen::ArrayXXd>& data);
 
 void simulateSatellite(const Eigen::Ref<Eigen::Vector2d>& pos, const Eigen::Ref<Eigen::Vector2d>& vel, SimParams& params);
+
+void simulateSatellites(std::vector<TestBody>& bodies, SimParams& params);
 
 #endif
