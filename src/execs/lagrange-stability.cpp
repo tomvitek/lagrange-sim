@@ -7,7 +7,7 @@
 #define TOTAL_TIME ((long long)2 * 365 * 24 * 3600)
 #define TIME_STEP 15
 #define SAVE_COUNT 10000
-#define OUTPUT_FILE "lagrange-stability-long2.csv"
+#define OUTPUT_FILE "lagrange-stability.csv"
 
 struct TestBodyGenParams {
     double rFrom;
@@ -36,7 +36,7 @@ std::vector<TestBody> generateTestBodies(TestBodyGenParams p) {
     return bodies;
 }
 
-int main(int argc, const char **args) {
+int main(int argc, const char **argv) {
     std::cerr << "Generating test bodies..." << std::endl;
     TestBodyGenParams genParams {
         .rFrom = MOON_A * 0.9,
@@ -57,4 +57,6 @@ int main(int argc, const char **args) {
     std::cerr << "Starting simulation..." << std::endl;
     simulateSatellites(bodies, simParams);
     std::cerr << "Simulation finished!" << std::endl;
+
+    return 0;
 }
