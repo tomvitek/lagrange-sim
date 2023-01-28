@@ -1,12 +1,10 @@
 import sys
+
 import numpy as np
 import pandas as pd
-from common import read_sat, MOON_A, L12_DST
+from common import plot_important_points, read_sat
 from matplotlib import cm
 from matplotlib import pyplot as plt
-
-D = 3.844e8
-d = 4.669e6
 
 if __name__ == "__main__":
     filepath = sys.argv[1]
@@ -25,14 +23,13 @@ if __name__ == "__main__":
 
     print(x.shape[1])
     ax = plt.gca()
-    ax.scatter(-d, 0, s=120, label="Earth")
-    ax.scatter(D -d, 0, s=100, label="Moon")
-    ax.plot(MOON_A - L12_DST, 0, 'x', label='L1')
-    ax.annotate("L1", (MOON_A - L12_DST, 0), textcoords="offset points", xytext=(0, 10), ha='center')
-    ax.plot(MOON_A + L12_DST, 0, 'x', label="L2")
-    ax.annotate("L2", (MOON_A + L12_DST, 0), textcoords="offset points", xytext=(0, 10), ha='center')
+    plot_important_points(ax)
+    
+
     plt.xlim(-6e8, 6e8)
     plt.ylim(-6e8, 6e8)
+    plt.xlabel("x [m]")
+    plt.ylabel("y [m]")
     plt.legend(loc="upper right")
     ax.set_aspect(1)
     plt.show()

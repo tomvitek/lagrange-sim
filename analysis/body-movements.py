@@ -1,7 +1,9 @@
 import sys
+from argparse import ArgumentParser
+
 import numpy as np
 import pandas as pd
-from common import read_sat
+from common import plot_important_points, read_sat, animate_base, render_plt_video
 from matplotlib import animation, cm
 from matplotlib import pyplot as plt
 
@@ -9,7 +11,19 @@ D = 3.844e8
 d = 4.669e6
 
 if __name__ == "__main__":
-    filepath = sys.argv[1]
+    argParser = ArgumentParser(
+        prog="body-movements",
+        description="Visualize body movements and optionally export them as an mp4"
+    )
+    argParser.add_argument("inputFile")
+    argParser.add_argument("--save")
+    argParser.add_argument("--vid-fps", default="30")
+    argParser.add_argument("--vid-dur", default="60")
+    args = argParser.parse_args()
+    print(args)
+    filepath = args.inputFile
+
+    
     t, x, y = read_sat(filepath)
     x: np.ndarray = x
     r_start = (x[0,:]**2 + y[0,:]**2)**0.5
@@ -40,38 +54,28 @@ if __name__ == "__main__":
 
     scat_r = ax_r.scatter(x[0,:], y[0,:], s=20, color=c_r)
     scat_phi = ax_phi.scatter(x[0,:], y[0,:], s=20, color=c_phi)
+        
     plt.suptitle('0.00 years')
 
     def animate(i):
         data = np.array(np.transpose(np.array((x[i,:], y[i,:]))))
         scat_r.set_offsets(data)
         scat_phi.set_offsets(data)
-        if t[i] < 3600 * 24:
-            titleStr = f"{t[i] / 3600:.2f} hours"
-        elif t[i] < 3600 * 24 * 30:
-            titleStr = f"{t[i] / 3600 / 24:.2f} days"
-        elif t[i] < 3600 * 24 * 365.256:
-            titleStr = f"{t[i] / 3600 / 24 / 30:.2f} months"
-        else:
-            titleStr = f"{t[i] / 3600 / 24 / 365.256} years"
-
-        plt.suptitle(titleStr)
+        
+        animate_base(i, t)
+        
         return scat_r,scat_phi
     
-    def anim_save_callback(current_frame: int, total_frames: int):
-        print(current_frame / total_frames * 100, "%")
+    
 
     for ax in (ax_r, ax_phi):
-        ax.scatter(-d, 0, s=120, label="Earth")
-        ax.scatter(D -d, 0, s=80, label="Moon")
+        plot_important_points(ax)
         ax.legend(loc="upper right")
 
     plt.xlim(-6e8, 6e8)
     plt.ylim(-6e8, 6e8)
         
     ani = animation.FuncAnimation(fig, animate, interval=30, frames=range(x.shape[0]), repeat=True)
-    FFwriter = animation.FFMpegWriter(fps=30)
-    if "--save" in sys.argv:
-        video_output_filepath = sys.argv[sys.argv.index("--save") + 1]
-        ani.save(video_output_filepath, writer=FFwriter, dpi=150, progress_callback=anim_save_callback)
+    if not args.save is None:
+        render_plt_video(args, ani)
     plt.show()
