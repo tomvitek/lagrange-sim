@@ -2,7 +2,7 @@
 #include <iostream>
 #include <limits>
 #include <eigen3/Eigen/Eigen>
-#include "rg4-sim.hpp"
+#include "rk4-sim.hpp"
 #include "phys-constants.h"
 
 using namespace Eigen;
@@ -49,7 +49,7 @@ void simulateSatellite(const Eigen::Ref<Eigen::Vector2d>& pos, const Eigen::Ref<
     x0 << pos.transpose(), vel.transpose();
 
     SimWriter<ArrayXXd> simWriter(params.outputFile);
-    RG4Solver<ArrayXXd> solver(lagrangeFunc, simWriter);
+    RK4Solver<ArrayXXd> solver(lagrangeFunc, simWriter);
     std::cout << "satellite simulation started" << std::endl;
     ArrayXXd result = solver.solve(params.time_from, params.time_step, params.time_to, x0, params.saveCount);
 }
@@ -63,6 +63,6 @@ void simulateSatellites(std::vector<TestBody>& bodies, SimParams& params) {
     }
 
     SimWriter<ArrayXXd> simWriter(params.outputFile);
-    RG4Solver<ArrayXXd> solver(lagrangeFunc, simWriter);
+    RK4Solver<ArrayXXd> solver(lagrangeFunc, simWriter);
     solver.solve(params.time_from, params.time_step, params.time_to, x0, params.saveCount);
 }

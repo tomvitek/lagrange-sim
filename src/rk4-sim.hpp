@@ -1,5 +1,5 @@
-#ifndef __RG4_SIM
-#define __RG4_SIM
+#ifndef __RK4_SIM
+#define __RK4_SIM
 
 #include <eigen3/Eigen/Eigen>
 #include "sim-writer.hpp"
@@ -13,15 +13,15 @@ using SolverFunc = Derived (*)(double t, const Derived& x0);
  * @tparam Which data class is used to represent data (e.g. Eigen::ArrayXXd for double or Eigen::ArrayXXf for float)
  */
 template<typename Derived>
-class RG4Solver {
+class RK4Solver {
 public:
     /**
-     * @brief Initiates a new RG4Solver instance
+     * @brief Initiates a new RK4Solver instance
      * 
      * @param func Function representing system of differetial equations
      * @param writer SimWriter instance used to write the output of the simulation
      */
-    RG4Solver(SolverFunc<Derived> func, SimWriter<Derived>& writer) : func(func), writer(writer) {
+    RK4Solver(SolverFunc<Derived> func, SimWriter<Derived>& writer) : func(func), writer(writer) {
         
     }
 
