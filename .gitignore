@@ -10,3 +10,11 @@ build
 output
 *.csv
 *.pyc
+
+# tex build files
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
