@@ -29,12 +29,12 @@
 
 \maketitle
 \section{Úvod a formulace}
-V této práci jsem se snažil posoudit stabilitu jednotlivých Lagrangových bodů (L1 - L5) pomocí
+V této práci jsem se snažil posoudit stabilitu jednotlivých Lagrangových bodů (L1 až L5) pomocí
 numerické simulace trajektorií těles v jejich blízkosti. Simulaci jsem dle zadání prováděl
 v neinerciální vztažné soustavě, spjaté se systémem Země-Měsíc, obě tělesa tedy v této soustavě 
 zůstávala v klidu. Simulaci jsem také pro jednoduchost prováděl pouze ve 2D, v rovině dané oběhem Měsíce kolem Země.
 
-Pro takovýto neinerciální systém lze pro tělesa o zantebatelné hmotnosti (takže nebudou ovlivňovat polohu Země a Měsíce)
+Pro takovýto neinerciální systém lze pro tělesa o zanedbatelné hmotnosti (takže nebudou ovlivňovat polohu Země a Měsíce)
 odvodit pohybové rovnice, které byly součástí zadání, tj.
 
 \begin{align*}
@@ -59,7 +59,9 @@ Hodnoty všech použitých konstant jsou uvedeny v tabulce \ref{tab:constants}
         $\mathrm{m \ [kg]}$ & $7.348 \cdot 10^{22}$ \\
         $\mathrm{D \ [m]}$ & $3.844 \cdot 10^{8}$ \\
         $\mathrm{d \ [m]}$ & $4.669 \cdot 10^{6}$ \\
-        $\mathrm{\Omega \ [s^{-1}]}$ & $2.661 \cdot 10^{-6}$
+        $\mathrm{\Omega \ [s^{-1}]}$ & $2.661 \cdot 10^{-6}$ \\
+        $\mathrm{R_E} \ [m]$ & $6378 \cdot 10^3$ \\
+        $\mathrm{R_M} \ [m]$ & $1737 \cdot 10^3$
     \end{tabular}
     \caption{Seznam v simulaci použitých konstant a jejich hodnot.}
     \label{tab:constants}
@@ -67,21 +69,21 @@ Hodnoty všech použitých konstant jsou uvedeny v tabulce \ref{tab:constants}
 
 \section{Popis numerického řešení}
 
-Pro numerické řešení zadané soustavy diferenciálních rovnic jsem zvolil metodu Runge-Kutta 4. řádu.
-Její odvozejí je však zbytečně zdlouhavé a technicky náročné, proto zde uvedu
+Pro numerické řešení zadané soustavy diferenciálních rovnic jsem zvolil metodu Runge-Kutta~4.~řádu.
+Její odvození je však zbytečně zdlouhavé a technicky náročné, proto zde uvedu
 jen odvození Runge-Kutty 2. řádu, které je založeno na stejném principu.
 
 \subsection{Odvození metody Runge-Kutta 2}
 
 Runge-Kutta je v podstatě zdokonalenou verzí Eulerovy metody řešení diferenciálních rovnic,
-pro demonstraci principu fungování tedy použiju ji. Vycházíme z předpokladu, že řešíme
+pro demonstraci principu fungování tedy použiji ji. Vycházíme z předpokladu, že řešíme
 problém, u nějž známe počáteční podmínky a funkci, která popisuje derivaci jednotlivých veličin, tj.
 \begin{equation*}
     \frac{\mathrm{d} y}{\mathrm{d} t} = f(y(t), t)
 \end{equation*}
 kde $y(t)$ je hledaná funkce.
 
-Eulerova metoda funguje tak, že pro daný stav systému předpokládá, že derivace $y$ se na zvoleném (dostatečně malém)
+Eulerova metoda funguje tak, že pro daný stav systému $y$ předpokládá, že derivace $y$ se na zvoleném (dostatečně malém)
 časovém kroku $h$ příliš nezmění a můžeme ji přibližně považovat za konstantní. Díky tomu
 pak lze vyjádřit stav systému v následujícím časovém kroku jako
 \begin{equation*}
@@ -182,16 +184,22 @@ Systém se tedy rozpadne do $4N$ diferenciálních rovnic (kde $N$ je množství
 
 Všechen použitý kód je dostupný na githubu zde: \url{https://github.com/tomvitek/lagrange-sim}.
 Lze ho rozdělit na dvě hlavní části - výpočetní a analytickou. Výpočetní je napsaná v C++, protože
-jsem si ho chtěl zopakovat a bál jsem se, že python by byl pro náročnější simulace příliš pomalý
+jsem si ho chtěl zopakovat a bál jsem se, že by python byl pro náročnější simulace příliš pomalý
 (zvlášť když bych v něm numerickou metodu implementoval přímo).
 
 Část renderující grafy je pak už napsaná v pythonu, v repozitáři ve složce \texttt{analysis}.
 
-Výpočetní část se skládá z dvou hlavních programů - \texttt{lagrange-rings} a \texttt{lagrange-span}.
+Výpočetní část se skládá ze dvou hlavních programů - \texttt{lagrange-rings} a \texttt{lagrange-span}.
 Vzájemně se však liší jen minimálně a nejspíš by v budoucnu šly sloučit do jednoho. První z nich slouží
 na simulaci pohybu těles po celém obvodu systému Země-Měsíc, ten druhý počáteční polohy těles generuje jen v okolí nějakého bodu.
 Oba programy přijímají řadu parametrů, které jsou popsány ve zdrojových kódech, při změně např. počtu těles tedy stačí
 změnit argument v terminálu.
+
+Simulace probíhá pomocí postupu popsaného výše (Runge-Kutta 4), pouze jsou navíc přidané elementární kolize - když se
+nějaké těleso v nějakém časovém kroku k Zemi nebo Měsíci přiblíží víc, než je jejich poloměr, těleso je v následujících
+krocích vymazáno (hodnota pozice a rychlosti nastavena na \texttt{NaN}).
+
+Data ze simulace jsou průběžné ukládána do csv souboru, ze kterého jsou poté čtena skriptem v pythonu v průběhu analýzy.
 
 \section{Výsledky}
 
@@ -251,7 +259,7 @@ Počáteční stav simulace a stav po třech letech je vidět na obrázcích \re
 Jak si lze všimnout, zatímco v lagrangových bodech L4 a L5 se vytvořily shluky částic, v ostatních k ničemu takovému nedochází.
 Jedině body L4 a L5 jsou tedy pro sondu stabilní i bez přídavných korekcí motorem.
 
-Zajímavé ale je, že se zdá, že oba body v sobě "chytají" jen tělesa, které už v nich nebo v jejich blízkosti na začátku simulace byla
+Zajímavé ale je, že se zdá, že oba body v sobě "chytají" jen tělesa, která už v nich nebo v jejich blízkosti na začátku simulace byla
 a neuchytí se v nich žádné jiné těleso (to jde vidět hlavně z pravého obrázku - oba Lagrangovy body mají v sobě
 jen tělesa velmi podobné barvy). To by však mohlo být i špatnou volbou počátečního rozmístění a rychlostí těles,
 na přesnější průzkum bych musel obojí víc randomizovat.
