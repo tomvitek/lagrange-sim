@@ -14,14 +14,14 @@ target_link_libraries(satellite
     ${Eigen_LIBRARIES}
 )
 
-add_executable(lagrange-stability
-    src/execs/lagrange-stability.cpp
+add_executable(lagrange-rings
+    src/execs/lagrange-rings.cpp
     src/lagrange-sim.cpp
     src/input-args-parser.cpp
 )
 
-add_executable(stability-l12
-    src/execs/stability-l12.cpp
+add_executable(lagrange-span
+    src/execs/lagrange-span.cpp
     src/lagrange-sim.cpp
     src/input-args-parser.cpp
 )
