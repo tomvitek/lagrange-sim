@@ -1,5 +1,7 @@
 #include <vector>
 #include <iostream>
+#include <fstream>
+#include <chrono>
 #include <eigen3/Eigen/Eigen>
 #include "../lagrange-sim.hpp"
 #include "../phys-constants.h"
@@ -48,6 +50,8 @@ int main(int argc, const char **argv) {
     const double totalTime = std::stod(argsParser.getValue("--time", "1e6"));
     const double timeStep = std::stod(argsParser.getValue("--tstep", "5"));
     const size_t saveCount = std::stoul(argsParser.getValue("--save-times", "1000"));
+    const bool noLog = argsParser.optionExists("--no-log");
+    
 
     std::cerr << "Generating test bodies..." << std::endl;
     TestBodyGenParams genParams {
@@ -67,9 +71,28 @@ int main(int argc, const char **argv) {
         .time_step = timeStep,
         .saveCount = saveCount
     };
+    
     std::cerr << "Starting simulation..." << std::endl;
+    auto simStartTime = std::chrono::high_resolution_clock::now();
     simulateSatellites(bodies, simParams);
+    auto simFinishTime = std::chrono::high_resolution_clock::now();
+    auto simMsTime = std::chrono::duration_cast<std::chrono::milliseconds>(simFinishTime - simStartTime);
     std::cerr << "Simulation finished!" << std::endl;
+    std::cerr << "It took " << simMsTime.count() << "ms" << std::endl;
+
+    if (!noLog) {
+        std::ofstream logStream = std::ofstream(outputFile + ".log");
+        logStream << "outputFile: " << outputFile <<
+            "\nfrom: " << rFromRel <<
+            "\nto: " << rToRel <<
+            "\nin-ring: " << countInRing <<
+            "\nrings: " << ringCount <<
+            "\ntime: " << totalTime <<
+            "\ntstep: " << timeStep <<
+            "\nsave-times: " << saveCount << 
+            "\n\ncalculation time: " << simMsTime.count() << "ms" << std::endl;
+        logStream.close();
+    }
 
     return 0;
 }

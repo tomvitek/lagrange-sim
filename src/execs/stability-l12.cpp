@@ -1,4 +1,6 @@
 #include <iostream>
+#include <chrono>
+#include <fstream>
 #include <eigen3/Eigen/Eigen>
 #include "../lagrange-sim.hpp"
 #include "../phys-constants.h"
@@ -81,6 +83,8 @@ int main(const int argc, const char *argv[]) {
     const size_t saveCount = std::stoul(argsParser.getValue("--save-times", "1000"));
     const std::string genTypeStr = argsParser.getValue("--gen-type", CMD_GEN_TYPE_RINGS);
     const double spanAngle = std::stod(argsParser.getValue("--span", "20")) * M_PI / 180;
+    const bool noLog = argsParser.optionExists("--no-log");
+
     TestBodyGenType genType;
     if (genTypeStr == CMD_GEN_TYPE_RINGS)
         genType = TestBodyGenType::RINGS;
@@ -122,8 +126,27 @@ int main(const int argc, const char *argv[]) {
         .time_step = timeStep,
         .saveCount = saveCount
     };
+    auto simStartTime = std::chrono::high_resolution_clock::now();
     simulateSatellites(bodies, simParams);
+    auto simFinishTime = std::chrono::high_resolution_clock::now();
+    auto simMsTime = std::chrono::duration_cast<std::chrono::milliseconds>(simFinishTime - simStartTime);
     std::cerr << "Simulation finished!" << std::endl;
+
+    if (!noLog) {
+        std::ofstream logStream = std::ofstream(outputFile + ".log");
+        logStream << "outputFile: " << outputFile <<
+            "\nfrom: " << rFromRel <<
+            "\nto: " << rToRel <<
+            "\nin-ring: " << countInRing <<
+            "\nrings: " << ringCount <<
+            "\ntime: " << totalTime <<
+            "\ntstep: " << timeStep <<
+            "\nsave-times: " << saveCount << 
+            "\ngen type: " << genTypeStr <<
+            "\nspan: " << spanAngle * 180 / M_PI << 
+            "\n\ncalculation time: " << simMsTime.count() << "ms" << std::endl;
+        logStream.close();
+    }
 
     return 0;
 }
