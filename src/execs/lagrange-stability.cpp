@@ -3,6 +3,7 @@
 #include <eigen3/Eigen/Eigen>
 #include "../lagrange-sim.hpp"
 #include "../phys-constants.h"
+#include "../input-args-parser.hpp"
 
 #define TOTAL_TIME ((long long)2 * 365 * 24 * 3600)
 #define TIME_STEP 15
@@ -37,22 +38,34 @@ std::vector<TestBody> generateTestBodies(TestBodyGenParams p) {
 }
 
 int main(int argc, const char **argv) {
+    InputArgsParser argsParser(argc, argv);
+
+    const std::string outputFile = argsParser.getValue("-o");
+    const double rFromRel = std::stod(argsParser.getValue("--from", "0.9"));
+    const double rToRel = std::stod(argsParser.getValue("--to", "1.1"));
+    const size_t countInRing = std::stoul(argsParser.getValue("--in-ring", "10"));
+    const size_t ringCount = std::stoul(argsParser.getValue("--rings", "5"));
+    const double totalTime = std::stod(argsParser.getValue("--time", "1e6"));
+    const double timeStep = std::stod(argsParser.getValue("--tstep", "5"));
+    const size_t saveCount = std::stoul(argsParser.getValue("--save-times", "1000"));
+
     std::cerr << "Generating test bodies..." << std::endl;
     TestBodyGenParams genParams {
-        .rFrom = MOON_A * 0.9,
-        .rTo = MOON_A * 1.1,
-        .countInRing = 40,
-        .ringCount = 20
+        .rFrom = MOON_A * rFromRel,
+        .rTo = MOON_A * rToRel,
+        .countInRing = countInRing,
+        .ringCount = ringCount
     };
 
     std::vector<TestBody> bodies = generateTestBodies(genParams);
     std::cerr << "Total bodies count: " << bodies.size() << std::endl;
+
     SimParams simParams {
-        .outputFile = OUTPUT_FILE,
+        .outputFile = outputFile.c_str(),
         .time_from = 0,
-        .time_to = TOTAL_TIME,
-        .time_step = TIME_STEP,
-        .saveCount = SAVE_COUNT
+        .time_to = totalTime,
+        .time_step = timeStep,
+        .saveCount = saveCount
     };
     std::cerr << "Starting simulation..." << std::endl;
     simulateSatellites(bodies, simParams);
