@@ -1,4 +1,5 @@
 import sys
+from argparse import ArgumentParser
 
 import numpy as np
 import pandas as pd
@@ -7,8 +8,19 @@ from matplotlib import cm
 from matplotlib import pyplot as plt
 
 if __name__ == "__main__":
-    filepath = sys.argv[1]
-    print(filepath)
+    argParser = ArgumentParser(
+        prog="body-movements",
+        description="Visualize body movements and optionally export them as an mp4"
+    )
+    argParser.add_argument("inputFile")
+    argParser.add_argument("--save")
+    argParser.add_argument("--x-range", default="-6e8;6e8")
+    argParser.add_argument("--y-range", default="-6e8;6e8")
+    args = argParser.parse_args()
+    print(args)
+
+    filepath = args.inputFile
+
     t, x, y = read_sat(filepath)
     x: np.ndarray = x
     r_start = (x[0,:]**2 + y[0,:]**2)**0.5
@@ -18,6 +30,12 @@ if __name__ == "__main__":
     print("r_start_max:", r_start_max)
 
     plt.figure()
+    plt_xrange_from = float(args.x_range.split(";")[0])
+    plt_xrange_to = float(args.x_range.split(";")[1])
+    plt_yrange_from = float(args.y_range.split(";")[0])
+    plt_yrange_to = float(args.y_range.split(";")[1])
+    plt.xlim(plt_xrange_from, plt_xrange_to)
+    plt.ylim(plt_yrange_from, plt_yrange_to)
     for i in range(x.shape[1]):
         plt.plot(x[:,i], y[:,i], '-', color=cm.brg((r_start[i] - r_start_min) / (r_start_max - r_start_min)))
 
@@ -25,9 +43,6 @@ if __name__ == "__main__":
     ax = plt.gca()
     plot_important_points(ax)
     
-
-    plt.xlim(-6e8, 6e8)
-    plt.ylim(-6e8, 6e8)
     plt.xlabel("x [m]")
     plt.ylabel("y [m]")
     plt.legend(loc="upper right")
