@@ -100,8 +100,8 @@ protected:
      */
     Derived step(double t, double t_step, Eigen::ArrayBase<Derived>& x) {
         Derived k1 = t_step * this->func(t, x);
-        Derived k2 = t_step * this->func(t + t_step / 2, x + k1);
-        Derived k3 = t_step * this->func(t + t_step / 2,  x + k2);
+        Derived k2 = t_step * this->func(t + t_step / 2, x + k1 / 2);
+        Derived k3 = t_step * this->func(t + t_step / 2,  x + k2 / 2);
         Derived k4 = t_step * this->func(t + t_step, x + k3);    
         return x + (k1 + 2 * k2 + 2 * k3 + k4) / 6;
     }
