@@ -22,7 +22,8 @@ if __name__ == "__main__":
     args = argParser.parse_args()
     print(args)
     filepath = args.inputFile
-
+    vid_dur = float(args.vid_dur)
+    vid_fps = float(args.vid_fps)
     
     t, x, y = read_sat(filepath)
     x: np.ndarray = x
@@ -57,7 +58,8 @@ if __name__ == "__main__":
         
     plt.suptitle('0.00 years')
 
-    def animate(i):
+    def animate(frame_i):
+        i = int(frame_i / vid_dur / vid_fps * len(t))
         data = np.array(np.transpose(np.array((x[i,:], y[i,:]))))
         scat_r.set_offsets(data)
         scat_phi.set_offsets(data)
@@ -75,7 +77,7 @@ if __name__ == "__main__":
     plt.xlim(-6e8, 6e8)
     plt.ylim(-6e8, 6e8)
         
-    ani = animation.FuncAnimation(fig, animate, interval=30, frames=range(x.shape[0]), repeat=True)
+    ani = animation.FuncAnimation(fig, animate, interval=int(1000 / vid_fps), frames=range(int(vid_dur * vid_fps)), repeat=True)
     if not args.save is None:
         render_plt_video(args, ani)
     plt.show()

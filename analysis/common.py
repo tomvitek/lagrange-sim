@@ -11,7 +11,7 @@ d = 4.669e6
 L12_DST = (MOON_A * pow(MOON_M / 3 / EARTH_M, 1/3))
 L3_X = -MOON_A * (1 + 7 * MOON_M / (12 * EARTH_M))
 L4_X = MOON_A / 2
-L4_Y = MOON_A * (3/4)**2
+L4_Y = MOON_A * (3/4)**0.5
 
 def read_sat(path: str):
     df = pd.read_csv(path)
@@ -42,7 +42,7 @@ def animate_base(i, t):
     elif t[i] < 3600 * 24 * 365.256:
         titleStr = f"{t[i] / 3600 / 24 / 30:.2f} months"
     else:
-        titleStr = f"{t[i] / 3600 / 24 / 365.256} years"
+        titleStr = f"{t[i] / 3600 / 24 / 365.256:.2f} years"
 
     plt.suptitle(titleStr)
 

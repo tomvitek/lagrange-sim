@@ -20,13 +20,17 @@ if __name__ == "__main__":
     arg_parser.add_argument("--labels", default=[], nargs="*")
 
     args = arg_parser.parse_args()
+    print("Arguments:")
     print(args)
+    vid_dur = float(args.vid_dur)
+    vid_fps = float(args.vid_fps)
     filepaths = args.inputFiles
 
     ts = []
     xs = []
     ys = []
     for filepath in filepaths:
+        print(f"Loading file {filepath}")
         t, x, y = read_sat(filepath)
         if not len(ts) == 0 and (len(ts[0]) != len(t)):
             raise RuntimeError(f"Compared file has different number of save times: {filepath} has {len(t)}, original has {ts[0]}.")
@@ -52,7 +56,8 @@ if __name__ == "__main__":
         label = None if len(args.labels) != len(ts) else args.labels[i]
         scatters.append(ax.scatter(x, y, s=point_size, alpha=.5, label=label))
     
-    def animate(i):
+    def animate(frame_i):
+        i = int(frame_i / vid_dur / vid_fps * len(ts[0]))
         for x, y, scatter in zip(xs, ys, scatters):
             data = np.transpose(np.array((x[i,:], y[i,:]), dtype=np.float64))
             scatter.set_offsets(data)
@@ -63,8 +68,8 @@ if __name__ == "__main__":
     def anim_save_callback(current_frame: int, total_frames: int):
         print(current_frame / total_frames * 100, "%")
     
-    plt.legend()
-    ani = animation.FuncAnimation(plt.gcf(), animate, interval=30, frames=range(ts[0].shape[0]), repeat=True)
+    plt.legend(loc="upper right")
+    ani = animation.FuncAnimation(plt.gcf(), animate, interval=(1000 / vid_fps), frames=range(int(vid_dur * vid_fps)), repeat=True)
     if not args.save is None:
         render_plt_video(args, ani)
     
