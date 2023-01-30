@@ -55,7 +55,7 @@ struct SimParams {
  * @param data Data array
  * @return Eigen::ArrayXXd Derivatives
  */
-Eigen::ArrayXXd lagrangeFunc(double t, const const Eigen::ArrayXXd& data);
+Eigen::ArrayXXd lagrangeFunc(double t, const Eigen::ArrayXXd& data);
 
 /**
  * @brief Simulates one satellite (body) in the system given by lagrangeFunc (Earth and Moon). Basically equivalent of
