@@ -21,6 +21,7 @@ struct TestBodyGenParams {
     size_t ringCount;
     TestBodyGenType genType;
     double spanAngle;
+    double spanOffset;
 };
 
 std::vector<TestBody> generateTestBodies(const TestBodyGenParams& p) {
@@ -54,7 +55,7 @@ std::vector<TestBody> generateTestBodies(const TestBodyGenParams& p) {
                     break; // Don't generate multiple bodies in the same spot
             }
             else if (p.genType == TestBodyGenType::SPAN) {
-                const double angle = p.spanAngle * angle_i / p.countInRing - p.spanAngle / 2;
+                const double angle = p.spanAngle * angle_i / p.countInRing - p.spanAngle / 2 + p.spanOffset;
                 const double rFrom = p.rFromRel * MOON_A;
                 const double rTo = p.rToRel * MOON_A;
                 const double r = rFrom + (rTo - rFrom) * ring / p.ringCount;
@@ -83,6 +84,7 @@ int main(const int argc, const char *argv[]) {
     const size_t saveCount = std::stoul(argsParser.getValue("--save-times", "1000"));
     const std::string genTypeStr = argsParser.getValue("--gen-type", CMD_GEN_TYPE_RINGS);
     const double spanAngle = std::stod(argsParser.getValue("--span", "20")) * M_PI / 180;
+    const double spanOffset = std::stod(argsParser.getValue("--span-offset")) * M_PI / 180;
     const bool noLog = argsParser.optionExists("--no-log");
 
     TestBodyGenType genType;
@@ -115,6 +117,7 @@ int main(const int argc, const char *argv[]) {
         .ringCount  = ringCount,
         .genType = genType,
         .spanAngle = spanAngle,
+        .spanOffset = spanOffset,
     };
     std::vector<TestBody> bodies = generateTestBodies(genParams);
     
