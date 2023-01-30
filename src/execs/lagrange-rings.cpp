@@ -13,9 +13,25 @@
 #define OUTPUT_FILE "lagrange-stability.csv"
 
 struct TestBodyGenParams {
+    /**
+     * @brief Rings inner radius, relative to Moon's semi-major axis (0 means start from center, 1 means start from Moon's orbit distance)
+     * 
+     */
     double rFrom;
+    /**
+     * @brief Rings outer radius, relative to Moon's semi-major axis. See `rFrom` for more details.
+     * 
+     */
     double rTo;
+    /**
+     * @brief Number of bodies in one ring
+     * 
+     */
     size_t countInRing;
+    /**
+     * @brief How many rings of bodies should there be
+     * 
+     */
     size_t ringCount;
 };
 
@@ -42,6 +58,7 @@ std::vector<TestBody> generateTestBodies(TestBodyGenParams p) {
 int main(int argc, const char **argv) {
     InputArgsParser argsParser(argc, argv);
 
+    // Read arguments
     const std::string outputFile = argsParser.getValue("-o");
     const double rFromRel = std::stod(argsParser.getValue("--from", "0.9"));
     const double rToRel = std::stod(argsParser.getValue("--to", "1.1"));
@@ -52,7 +69,7 @@ int main(int argc, const char **argv) {
     const size_t saveCount = std::stoul(argsParser.getValue("--save-times", "1000"));
     const bool noLog = argsParser.optionExists("--no-log");
     
-
+    // Generate simulated bodies
     std::cerr << "Generating test bodies..." << std::endl;
     TestBodyGenParams genParams {
         .rFrom = MOON_A * rFromRel,
@@ -72,6 +89,7 @@ int main(int argc, const char **argv) {
         .saveCount = saveCount
     };
     
+    // Start the simulation
     std::cerr << "Starting simulation..." << std::endl;
     auto simStartTime = std::chrono::high_resolution_clock::now();
     simulateSatellites(bodies, simParams);

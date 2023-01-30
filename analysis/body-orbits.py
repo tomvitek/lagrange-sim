@@ -1,4 +1,3 @@
-import sys
 from argparse import ArgumentParser
 
 import numpy as np
@@ -10,7 +9,7 @@ from matplotlib import pyplot as plt
 if __name__ == "__main__":
     argParser = ArgumentParser(
         prog="body-movements",
-        description="Visualize body movements and optionally export them as an mp4"
+        description="Visualize body orbits"
     )
     argParser.add_argument("inputFile")
     argParser.add_argument("--save")

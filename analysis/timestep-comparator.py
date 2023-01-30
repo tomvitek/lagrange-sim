@@ -8,7 +8,7 @@ from matplotlib import pyplot as plt
 if __name__ == "__main__":
     arg_parser = ArgumentParser(
         prog="sim-comparator",
-        description="Compares two simulations with identical save interval"
+        description="Compares two or more simulations with identical save interval. Useful for comparing different timesteps"
     )
     arg_parser.add_argument("inputFiles", nargs="+")
     arg_parser.add_argument("--save")

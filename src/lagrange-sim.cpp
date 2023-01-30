@@ -19,14 +19,18 @@ using namespace Eigen;
 #define INDEX_VY 3
 #define BODY_PARAM_COUNT 4
 
-ArrayXXd lagrangeFunc(double t, const ArrayXXd& data) {
+ArrayXXd lagrangeFunc(double t, const Eigen::ArrayXXd& data) {
+    // Separate data array into individual pieces for readability
     ArrayXd x = data(all, seq(INDEX_X, last, BODY_PARAM_COUNT));
     ArrayXd y = data(all, seq(INDEX_Y, last, BODY_PARAM_COUNT));
     ArrayXd vx = data(all, seq(INDEX_VX, last, BODY_PARAM_COUNT));
     ArrayXd vy = data(all, seq(INDEX_VY, last, BODY_PARAM_COUNT));
+
+    // Compute distance from Earth and Moon to each body, powered by 3
     ArrayXd r1pow3 = Eigen::pow(Eigen::pow(x + d, 2) + Eigen::pow(y, 2), 1.5);
     ArrayXd r2pow3 = Eigen::pow(Eigen::pow(x + d - D, 2) + Eigen::pow(y, 2), 1.5);
 
+    // Compute derivatives
     ArrayXXd derivatives(data.rows(), data.cols());
     derivatives(all, seq(INDEX_VX, last, BODY_PARAM_COUNT)) = -G * (EARTH_M * (x + mu1 * D) / r1pow3 + MOON_M * (x - mu2 * D) / r2pow3) + Omega * Omega * x + 2 * Omega * vy;
     derivatives(all, seq(INDEX_VY, last, BODY_PARAM_COUNT)) = -G * (EARTH_M * y / r1pow3 + MOON_M * y / r2pow3) + Omega * Omega * y - 2 * Omega * vx;
@@ -57,6 +61,7 @@ void simulateSatellite(const Eigen::Ref<Eigen::Vector2d>& pos, const Eigen::Ref<
 void simulateSatellites(std::vector<TestBody>& bodies, SimParams& params) {
     ArrayXXd x0(bodies.size(), BODY_PARAM_COUNT);
 
+    // Convert list of bodies to the initial array for RK4Solver
     for (size_t i = 0; i < bodies.size(); ++i) {
         const TestBody& body = bodies[i];
         x0.row(i) << body.pos.transpose(), body.vel.transpose();

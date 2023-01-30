@@ -43,14 +43,17 @@ public:
         uint32_t saveCount
     ) {
         Derived x = x0;
+
+        // Initiate writer for saving result data
         this->writer.open();
         writer.write(0, x);
 
-        if (writeStatus)
+        if (printStatus)
             std::cerr << "0%" << std::flush;
+        
         const uint64_t iterationCount = (t_to - t_from) / t_step;
-        const double saveTimeDelta = (t_to - t_from) / (saveCount - 1);
-        double nextSaveTime = saveTimeDelta;
+        const double saveTimeDelta = (t_to - t_from) / (saveCount - 1); // How often should simulation data be saved
+        double nextSaveTime = saveTimeDelta; // In what time should be the simulation data saved next
         uint64_t iteration = 0;
 
         while (iteration < iterationCount) {
@@ -62,10 +65,8 @@ public:
                 writer.write(t, x);
                 nextSaveTime += saveTimeDelta;
 
-                if (this->writeStatus){
-                    
+                if (this->printStatus)
                     std::cerr << "\r                 \r" << iteration * 1000 / iterationCount / 10.0 << "%" << std::flush;
-                }
             }
         }
 
@@ -88,7 +89,7 @@ public:
     /**
      * @brief Set this to false if you don't want to see simulation percentage in cerr.
      */
-    bool writeStatus = true;
+    bool printStatus = true;
 protected:
     /**
      * @brief Performs one step of the simulation

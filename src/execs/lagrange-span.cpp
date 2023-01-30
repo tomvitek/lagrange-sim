@@ -10,17 +10,54 @@
 #define CMD_GEN_TYPE_SPAN "span"
 
 enum TestBodyGenType {
+    /**
+     * @brief Rings around the Moon
+     * 
+     */
     RINGS,
+    /**
+     * @brief Partial rings centered in the center of the system
+     * 
+     */
     SPAN
 };
 
 struct TestBodyGenParams {
+    /**
+     * @brief Rings inner radius, relative to Moon's semi-major axis (0 means start from center, 1 means start from Moon's orbit distance)
+     * 
+     */
     double rFromRel;
+    /**
+     * @brief Rings outer radius, relative to Moon's semi-major axis. See `rFrom` for more details.
+     * 
+     */
     double rToRel;
+    /**
+     * @brief Number of bodies in one ring
+     * 
+     */
     size_t countInRing;
+    /**
+     * @brief How many rings of bodies should there be
+     * 
+     */
     size_t ringCount;
+    /**
+     * @brief What pattern should the bodies have
+     * 
+     */
     TestBodyGenType genType;
+    /**
+     * @brief If `genType` is `SPAN`, this defines how wide the span is
+     * 
+     */
     double spanAngle;
+    /**
+     * @brief If `genType` is `SPAN`, this defines how much the span is offset from the Moon (in radians).
+     * 
+     * Useful for simulating bodies around L3 point (than this would be `M_PI`).
+     */
     double spanOffset;
 };
 
@@ -74,6 +111,7 @@ std::vector<TestBody> generateTestBodies(const TestBodyGenParams& p) {
 int main(const int argc, const char *argv[]) {
     InputArgsParser argsParser(argc, argv);
 
+    // Read arguments
     const std::string outputFile = argsParser.getValue("-o");
     const double rFromRel = std::stod(argsParser.getValue("--from", "0.0"));
     const double rToRel = std::stod(argsParser.getValue("--to", "0.5"));
@@ -108,6 +146,7 @@ int main(const int argc, const char *argv[]) {
         << std::endl;
 
 
+    // Generate bodies
     std::cerr << "Generating test bodies..." << std::endl;
 
     const TestBodyGenParams genParams {
@@ -121,6 +160,7 @@ int main(const int argc, const char *argv[]) {
     };
     std::vector<TestBody> bodies = generateTestBodies(genParams);
     
+    // Start the simulation
     std::cerr << "Starting simulation..." << std::endl;
     SimParams simParams {
         .outputFile = outputFile.c_str(),
@@ -135,6 +175,7 @@ int main(const int argc, const char *argv[]) {
     auto simMsTime = std::chrono::duration_cast<std::chrono::milliseconds>(simFinishTime - simStartTime);
     std::cerr << "Simulation finished!" << std::endl;
 
+    // Save the log file
     if (!noLog) {
         std::ofstream logStream = std::ofstream(outputFile + ".log");
         logStream << "outputFile: " << outputFile <<

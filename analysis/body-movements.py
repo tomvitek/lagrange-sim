@@ -32,6 +32,7 @@ if __name__ == "__main__":
     
     t, x, y = read_sat(filepath)
     x: np.ndarray = x
+    # Find start value of distance from center and angle of each body in order to colorize them
     r_start = (x[0,:]**2 + y[0,:]**2)**0.5
     r_start_min = np.nanmin(r_start)
     r_start_max = np.nanmax(r_start)
@@ -85,7 +86,7 @@ if __name__ == "__main__":
     for ax in (ax_r, ax_phi):
         plot_important_points(ax)
         ax.legend(loc="upper right")
-        
+    
     ani = animation.FuncAnimation(fig, animate, interval=int(1000 / vid_fps), frames=range(int(vid_dur * vid_fps)), repeat=True)
     if not args.save is None:
         render_plt_video(args, ani)
